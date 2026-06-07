@@ -2,9 +2,11 @@
 from pydantic import BaseModel, Field
 
 # 3rd Libs
+from langchain.agents import create_agent
 
 # Insource
 from src.agents.architect import ArchitectSubTaskList
+from src.tools.tools import *
 # =================== SOURCE ======================
 class CodeState(BaseModel):
     currentTaskIndex: int = Field(
@@ -51,5 +53,30 @@ class CodingAgent:
         
 
     def __call__(self, state):
-        pass
+        def __call__(self, state):
+            codeState = state.get("codeState")
+            if codeState is None:
+                codeState= CodeState(taskList=state["architectTasklist"], currentTaskIndex=0)
+            
+            
+            currentTaskIndex = codeState.currentTaskIndex
+            if currentTaskIndex >= len(codeState.taskList.implementSteps):
+                return {"codeState": codeState, "status": "DONE"}
+            currentTask =codeState.taskList.implementSteps[currentTaskIndex]
+            existingContent = readFile.run(currentTask.filePath)
+            
+            user_prompt = (
+                f"Nhiệm vụ: {currentTask.task_description}\n",
+                f"File: {currentTask.filePath}\n"
+                f"Existing Content:\n {existingContent}\n"
+                f"Sử dụng writeFile(path, content) để lưu thay đổi."
+            )
+            system_prompt = self.sysprompt()
+            
+            agent = create_agent(self.llm, self.tools)
+            agent.invoke({"messages": [{"role": "system", "content":system_prompt},
+                                    {"role": "user", "content": user_prompt}]})        
+            # 
+            codeState.currentTaskIndex +=1
+            return {"codeState": codeState}
 

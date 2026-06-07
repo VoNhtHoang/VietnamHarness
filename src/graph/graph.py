@@ -1,7 +1,8 @@
 # 1st Libs
-
+from dotenv import load_dotenv
 # 3rd Libs
 from langgraph.graph import StateGraph, START, END
+from langgraph.checkpoint.memory import MemorySaver
 from langchain_google_genai import ChatGoogleGenerativeAI
 
 # Insource
@@ -10,6 +11,8 @@ from src.nodes.planner_node import PlannerNode
 
 
 # ============== SOURCE ===================
+load_dotenv()
+memory = MemorySaver()
 
 # init
 llm = ChatGoogleGenerativeAI(
@@ -30,5 +33,6 @@ graph.add_edge("planner", END)
 # entrypoint
 graph.set_entry_point("planner")
 
-workflow = graph.compile()
+workflow = graph.compile(checkpointer=memory)
+
 

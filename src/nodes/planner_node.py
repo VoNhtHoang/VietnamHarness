@@ -39,7 +39,10 @@ class PlannerNode:
         Hàm thực thi khi langgraph gọi tới
         """
         
-        userPrompt = state.get("")
+        userPrompt = state.userMessages[-1]
+        if hasattr(userPrompt, 'content'):
+            userPrompt= userPrompt.content
+
         prompt = get_sys_prompt() + f"\nYêu cầu của người dùng: {userPrompt}"
         
         response = self.llm.with_structured_output(Plan).invoke(prompt)
