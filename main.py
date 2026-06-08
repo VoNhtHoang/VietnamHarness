@@ -1,18 +1,18 @@
 # 1rd Libs
-from codecs import latin_1_decode
 import json
 import uuid
 import sys
-from dotenv import load_dotenv
+import atexit
 
 # 3rd Libs
 
 # Insource
-from src.graph.graph import workflow
+from src.graph.graph import _init_workflow
 
 
 # ================== SOURCE =========================
 def run_session ():
+    workflow =  _init_workflow()
     print("=" * 60)
     print("TEST SESSION ACTIVE")
     print("=" * 60)

@@ -22,13 +22,13 @@ class SharedState(BaseModel):
     
     userMessages: Annotated[Sequence[BaseMessage], add_messages] =  Field(description="Save user's history chat in current session")
     
-    currentPlan: Optional[Dict[str, Any]] = Field("Chứa danh sách các nodes mà LLM đề xuất")
-    # currentPlanGraph: StateG
+    relevantAgents: List[Dict[str, Any]] = Field(default=[], description="Danh sách Agent phù hợp quét từ VectorDB")
+    
+    currentPlan: Optional[Dict[str, Any]] = Field(default=None, description="Chứa danh sách các nodes mà LLM đề xuất")
      
-    resMessages: Annotated[Sequence[BaseMessage], add_messages] = Field(description="Messages nhận từ LLM")
-    status: str = "DONE"
-    # mcp_servers: McpServer
-    # mcpConnected: int = 0
+    resMessages: Annotated[Sequence[BaseMessage], add_messages] = Field(default=[], description="Messages nhận từ LLM")
+    
+    status: str = Field(default="processing", description="Trạng thái hệ thống: processing, failed, approved")
     
     model_config = ConfigDict(extra="allow")
     

@@ -3,7 +3,7 @@ import subprocess
 
 from langchain_core.tools import tool
 
-PROJECT_ROOT= pathlib.Path.cwd() / "basic_web_generation/ai_proj"
+PROJECT_ROOT= pathlib.Path.cwd() / "/ai_proj"
 
 def safePath(path: str) -> pathlib.Path:
     resolved_root = PROJECT_ROOT.resolve()

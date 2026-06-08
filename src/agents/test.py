@@ -46,10 +46,10 @@ class TestAgentNode:
     """
     Một node (agent) có thể được dùng trong LangGraph, có chức năng tạo các trường hợp test và thực thi các cậu lệnh dựa trên modified system files để test mã nguồn.
     """
-    
+    metadata = TestAgentMetaData()
     def __init__(self, llm):
         self.llm = llm
-        self.metadata = TestAgentMetaData()
+        
         self.system_prompt = (
             "Bạn là một Kỹ sư Kiểm thử Phần mềm Tự động (QA Automation Engineer) cấp cao. "
             "Nhiệm vụ của bạn là đọc danh sách các file mã nguồn được cung cấp, hiểu mục đích của chúng, "

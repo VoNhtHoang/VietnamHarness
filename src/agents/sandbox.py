@@ -26,4 +26,9 @@ class SandboxAction(BaseModel):
 
 class SandboxAgent:
     """ """
-    pass
+    metadata = SandboxMetaData()
+    def __init__(self, llm):
+        self.llm = llm
+    
+    def __call__(self, state):
+        pass

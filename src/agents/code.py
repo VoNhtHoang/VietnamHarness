@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 from langchain.agents import create_agent
 
 # Insource
-from src.agents.architect import ArchitectSubTaskList
+from src.agents.init_base import SubTaskList
 from src.tools.tools import *
 # =================== SOURCE ======================
 class CodeState(BaseModel):
@@ -13,13 +13,13 @@ class CodeState(BaseModel):
         0, 
         description="Index của Task đang được Code Agent thực hiện hiện tại."
     )    
-    subTaskList: ArchitectSubTaskList = Field (
+    subTaskList: SubTaskList = Field (
         description= "List sub-tasks để thực hiện yêu cầu của người dùng"
     )
     currentFileContent : str = Field(None, 
                                               description="Nội dung của file đang được chỉnh sửa.")
     
-class CodeMetadata(BaseModel):
+class CodeMetaData(BaseModel):
     name: str = Field(default="coding_agent", description = "Tên định danh bắt buộc, không thể đổi.")
     
     capability: str  = Field(
@@ -28,6 +28,12 @@ class CodeMetadata(BaseModel):
         """)
     
 class CodingAgent:
+    """"""
+    
+    # ==== variables ==
+    metadata = CodeMetaData()
+    
+    # funcs
     def __init__(self, llm):
         self.llm = llm
         self.codingPrompt = """\
