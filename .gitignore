@@ -2,3 +2,4 @@
 api*
 temp*
 *vector_db*
+*.db

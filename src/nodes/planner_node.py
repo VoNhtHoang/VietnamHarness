@@ -51,7 +51,7 @@ class PlannerNode:
             userPrompt= userPrompt.content
             
         
-        relevantAgents = self.agentsRegistry.query_relevant_agents(userPrompt, 3, 1.2)
+        relevantAgents = self.agentsRegistry.query_relevant_agents(userPrompt, 3, 1.5)
         
         if not relevantAgents:
             error_msg = (
@@ -68,32 +68,33 @@ class PlannerNode:
         for idx, agent in enumerate(relevantAgents):
             agents_context += f"[{idx+1}] Agent Name: {agent['name']}\nCapability: {agent['capability']}\n\n"
         
-        sysPrompt = f"""Bạn là Bộ Định Tuyến Hệ Thống (Planner Router) phụ trách tạo ra đồ thị thực thi động (Dynamic Graph). Dưới đây là danh sách các Agents duy nhất bạn có quyền sử dụng để phân rã nhiệm vụ:
+        prompt = f"""Bạn là Bộ Định Tuyến Hệ Thống (Planner Router) phụ trách tạo ra đồ thị thực thi động (Dynamic Graph). Dưới đây là danh sách các Agents duy nhất bạn có quyền sử dụng để phân rã nhiệm vụ:
             {agents_context}
         Nhiệm vụ của bạn: Dựa trên yêu cầu của người dùng, hãy thiết kế một chuỗi các bước (Dynamic Graph) liên kết các Agent phù hợp lại với nhau.
-        Bạn BẮT BUỘC phải trả về định dạng JSON nghiêm ngặt theo cấu trúc sau:
-        {{
-        "tasks": [
-            {{
-            "step": 1,
-            "agent_name": "Tên agent được chọn từ danh sách trên",
-            "task_description": "Mô tả chi tiết công việc cụ thể cho agent này"
-            }}
-        ]
-        }}"""
         
-
+        Yêu cầu của người dùng:
+        {userPrompt}
+        """
+        
+        # Bạn BẮT BUỘC phải trả về định dạng JSON nghiêm ngặt theo cấu trúc sau:
+        # {{
+        # "tasks": [
+        #     {{
+        #     "step": 1,
+        #     "agent_name": "Tên agent được chọn từ danh sách trên",
+        #     "task_description": "Mô tả chi tiết công việc cụ thể cho agent này"
+        #     }}
+        # ]
+        # }}
+        
         try:
-            response = self.llm.generate_dynamic_graph(
-                system_prompt=sysPrompt, 
-                user_prompt=userPrompt
-            )
+            response = self.llm.with_structured_output(Plan).invoke(prompt)
             
-            dynamicGraph = json.loads(response)
-            
+            # dynamicGraph = json.loads(response)
             return {
                 "relevantAgents": relevantAgents,
-                "currentPlan": dynamicGraph,
+                "currentPlan": {"nodes": response.nodes,
+                                "planDescription": response.planDescriptionMessage},
                 "status": "success",
                 "resMessages": state.resMessages + [f" Đã lập kế hoạch đồ thị động thành công với {len(relevantAgents)} agents!"]
             }

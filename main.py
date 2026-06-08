@@ -61,8 +61,8 @@ def run_session ():
                 
             if "currentPlan" in result and result["currentPlan"]:
                 print("\n[AI] [Current Plan Status]:")
-                print(json.dumps(result["currentPlan"], indent=2, ensure_ascii=False))
-        
+                # print(json.dumps(result["currentPlan"], indent=2, ensure_ascii=False))
+                print(result.currentPlan)
         except KeyboardInterrupt:
             print(f"\n[W] Đột ngột ngắt Session [{session_id}]. Dữ liệu đã lưu tạm.")
             break

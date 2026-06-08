@@ -74,11 +74,13 @@ class AgentRegistry:
         
         results = self.collection.query(
             query_texts=[userPrompt],
-            n_results= maxResults
+            n_results= maxResults,
         )
         
+        print(f"[i] Agent Registry: {results} ")
+        
         relevantAgents = []
-        if not results or not results['ids'] or len(results['ids'][0]) == 0:
+        if not results and not results['ids'] and len(results['ids'][0]) < 1:
             return relevantAgents
         
         for i in range(len(results["ids"][0])):
