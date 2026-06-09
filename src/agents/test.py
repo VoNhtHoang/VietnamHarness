@@ -49,7 +49,6 @@ class TestAgentNode:
     metadata = TestAgentMetaData()
     def __init__(self, llm):
         self.llm = llm
-        
         self.system_prompt = (
             "Bạn là một Kỹ sư Kiểm thử Phần mềm Tự động (QA Automation Engineer) cấp cao. "
             "Nhiệm vụ của bạn là đọc danh sách các file mã nguồn được cung cấp, hiểu mục đích của chúng, "
@@ -57,7 +56,7 @@ class TestAgentNode:
             "mô tả các test case chi tiết bên trong, và câu lệnh chính xác để chạy bộ test đó."
         )
         
-    def call(self, state: dict) -> dict:
+    def __call__(self, state: dict):
         """
         Hàm thực thi chính của Node bên trong đồ thị LangGraph.
         """

@@ -10,7 +10,8 @@ from langgraph.graph.message import add_messages
 from langchain_core.messages import BaseMessage
 
 # Insource
-from src.nodes.planner_node import Plan
+from src.graph.edge import DynamicGraph
+from src.graph.node import Node
 
 class SharedState(BaseModel):
     """ Shared State for all agents, sub-tasks """
@@ -24,7 +25,8 @@ class SharedState(BaseModel):
     
     relevantAgents: List[Dict[str, Any]] = Field(default=[], description="Danh sách Agent phù hợp quét từ VectorDB")
     
-    currentPlan: Optional[Dict[str, Any]] = Field(default=None, description="Chứa danh sách các nodes mà LLM đề xuất")
+    # currentPlan: Optional[Dict[str, Any]] = Field(default=None, description="Chứa danh sách các nodes mà LLM đề xuất")
+    currentPlan: List[Node] = Field(default=None, description="Danh sách các node được planner node đề xuất, xây dựng và compile")
      
     resMessages: Annotated[Sequence[BaseMessage], add_messages] = Field(default=[], description="Messages nhận từ LLM")
     

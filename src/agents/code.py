@@ -24,8 +24,9 @@ class CodeMetaData(BaseModel):
     
     capability: str  = Field(
         default= """\
-        Chuyên xử lý các sub-tasks dựa trên mô tả chi tiết từ các agent lập lịch, architect, kế hoạch, chỉnh sửa, ... Can thiệp trực tiếp trên file và current working directory; Với những hành vi vượt quá quy tắc chung, phải yêu cầu sự chấp thuận từ phía người dùng.
+        Chuyên xử lý các sub-tasks liên quan đến coding, fix bug, tạo, chỉnh sửa file, developing,... dựa trên mô tả chi tiết từ các agent lập lịch, architect, kế hoạch, chỉnh sửa,... Can thiệp trực tiếp trên file và current working directory.
         """)
+    # Với những hành vi vượt quá quy tắc chung, phải yêu cầu sự chấp thuận từ phía người dùng.
     
 class CodingAgent:
     """"""

@@ -1,4 +1,5 @@
 # 1st Libs
+from csv import Error
 import importlib
 import inspect
 from pathlib import Path
@@ -49,6 +50,7 @@ class AgentRegistry:
 
             for name, obj in inspect.getmembers(module, inspect.isclass):
                 # print(f"[i] Agent Registry{name}")
+                className = obj.__name__
                 if hasattr(obj, "metadata") and obj.metadata:
                     # curMetadata = obj.metadata
                     agentsCount +=1
@@ -60,7 +62,9 @@ class AgentRegistry:
                         documents=[f"Agent Name: {agentName}\nCapability: {agentCapability}"],
                         metadatas=[{
                             "name": agentName,
-                            "capability": agentCapability
+                            "capability": agentCapability,
+                            "className": className,
+                            "moduleName": moduleName
                         }]
                     )
             
@@ -93,3 +97,25 @@ class AgentRegistry:
         
         return relevantAgents
     
+    def getAgentClass(self, nodeName: str):
+        if not nodeName:
+            raise ValueError("[ERR] PlannerNode - Agent Registry: Node Name not found ")
+        
+        result = self.collection.get(
+        ids=[nodeName],
+        include=["metadatas"]
+    )
+
+        if not result["ids"]:
+            raise ValueError(f"[ERR] Planner Node - Agent Registry Agent {nodeName} not found")
+        
+        
+        metadata = result["metadatas"][0]
+        module = importlib.import_module(
+            metadata["moduleName"]
+        )
+
+        return getattr(
+            module,
+            metadata["className"]
+        )    

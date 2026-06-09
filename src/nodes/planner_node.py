@@ -1,7 +1,8 @@
 # 1st Libs
 import re
 import json
-from typing import List, Dict
+from typing import List, Dict, Optional
+from langgraph.graph import StateGraph
 from pydantic import BaseModel, Field
 
 # 3rd Libs
@@ -11,22 +12,10 @@ from langchain_core.messages import AIMessage
 from src import agents
 from src.prompts.system_prompt import get_sys_prompt
 from src.rag.agent_registry import AgentRegistry
-
-class Node(BaseModel):
-    name: str = Field(
-        description="Tên định danh của node (ví dụ: 'crawl_data', 'analyze_content', 'send_email'). Viết thường, không dấu, phân tách bằng dấu gạch dưới.")
+from src.graph.edge import createDynamicRouter, DynamicGraph
+from src.state.state import SharedState
     
-    description: str = Field(
-        description="Mô tả cụ thể các công việc sẽ làm trong Node này, có thể chia nhỏ thành các task nhỏ để làm tuần tự."
-        )
-    
-    
-class Plan(BaseModel):
-    nodes: List[Node] = Field(description="Chứa các nodes cần để thực hiện yêu cầu của người dùng")
-    planDescriptionMessage: str = Field("Câu trả lời ngắn gọn, xúc tích (không phải lý do) dành cho người dùng, mô tả về kiến trúc graph gồm các node sẽ được thực thi để hoàn thành yêu cầu của người dùng. Messages này sẽ được hiển thị cho người dùng, yêu cầu người dùng xác nhận: chấp thuận / từ chối.")
-    #Nếu người dùng chấp thuận, tiến hành thực thi graph. Ngược lại, hãy tạo một plan mới.")
-    
-    
+# =================== SOURCE ============================
 class PlannerNode:
     """
     Initialize a Planner Agent that helps create a Plan with Nodes.
@@ -70,7 +59,7 @@ class PlannerNode:
         
         prompt = f"""Bạn là Bộ Định Tuyến Hệ Thống (Planner Router) phụ trách tạo ra đồ thị thực thi động (Dynamic Graph). Dưới đây là danh sách các Agents duy nhất bạn có quyền sử dụng để phân rã nhiệm vụ:
             {agents_context}
-        Nhiệm vụ của bạn: Dựa trên yêu cầu của người dùng, hãy thiết kế một chuỗi các bước (Dynamic Graph) liên kết các Agent phù hợp lại với nhau.
+        Nhiệm vụ của bạn: Dựa trên yêu cầu của người dùng, hãy thiết kế một chuỗi các bước (Dynamic Graph) liên kết các Agent phù hợp lại với nhau, có thể có cả conditional edges, ...
         
         Yêu cầu của người dùng:
         {userPrompt}
@@ -88,13 +77,16 @@ class PlannerNode:
         # }}
         
         try:
-            response = self.llm.with_structured_output(Plan).invoke(prompt)
+            response = self.llm.with_structured_output(DynamicGraph).invoke(prompt)
+            
+            dynamicGraph = self.compileDynamicGraph(
+                plan = response
+            )
             
             # dynamicGraph = json.loads(response)
             return {
                 "relevantAgents": relevantAgents,
-                "currentPlan": {"nodes": response.nodes,
-                                "planDescription": response.planDescriptionMessage},
+                "currentPlan": response.nodes,
                 "status": "success",
                 "resMessages": state.resMessages + [f" Đã lập kế hoạch đồ thị động thành công với {len(relevantAgents)} agents!"]
             }
@@ -111,4 +103,36 @@ class PlannerNode:
         #     "currentPlan": response.model_dump(),
         #     "resMessages": [AIMessage(content=response.planDescriptionMessage)]
         # }
+        
+    def compileDynamicGraph(self, plan: DynamicGraph):
+        workflow = StateGraph(SharedState)
+        for node in plan.nodes:
+            nodeName = node.name
+            agentClass = self.agentsRegistry.getAgentClass(nodeName)
+            agentInstance = agentClass(self.llm)
+            workflow.add_node(nodeName, agentInstance)
+            
+        # entrypoint
+        workflow.set_entry_point(plan.entryPoint)
+        
+        # conditional Edges
+        for edge in plan.edges:
+            if not edge.isCondition:
+                workflow.add_edge(edge.source, edge.target)
+            
+            else:
+                routerFunc = createDynamicRouter(edge.routerCode)
+                
+                print(edge.conditionalMapping)
+                print(routerFunc)
+
+                workflow.add_conditional_edges(
+                    edge.source,
+                    routerFunc,
+                    edge.conditionalMapping
+                )
+        
+        return workflow.compile()
+            
+            
         
