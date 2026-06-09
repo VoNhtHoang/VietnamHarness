@@ -3,11 +3,13 @@
 .env.*
 
 # SQLite databases (Bao gồm cả file journal phụ khi SQLite đang ghi dữ liệu)
+*agent_vector_db*
 *.db
 *.db-journal
 *.sqlite3
 
 # Thư mục hoặc file liên quan đến session, api, temp
+*vector_db/*
 sessions/
 sessions*
 api/
