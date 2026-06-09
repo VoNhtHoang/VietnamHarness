@@ -9,6 +9,7 @@
 *.sqlite3
 
 # Thư mục hoặc file liên quan đến session, api, temp
+*db*
 *vector_db/*
 sessions/
 sessions*
