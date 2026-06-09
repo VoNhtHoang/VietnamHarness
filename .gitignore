@@ -1,6 +1,20 @@
+# Local environment variables
 .env
+.env.*
+
+# SQLite databases (Bao gồm cả file journal phụ khi SQLite đang ghi dữ liệu)
+*.db
+*.db-journal
+*.sqlite3
+
+# Thư mục hoặc file liên quan đến session, api, temp
+sessions/
+sessions*
+api/
 api*
+temp/
 temp*
-*vector_db*
-*.db*
-sessions.*
+
+# Các file sinh ra do chạy code của Python
+__pycache__/
+*.py[cod]
