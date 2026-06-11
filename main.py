@@ -31,7 +31,7 @@ def run_session ():
     }
     
     print("-" * 60)
-    print("Nhập 'exit' hoặc 'quit' để kết thúc phiên làm việc.")
+    print("Nhập 'exit()' hoặc 'quit()' để kết thúc phiên làm việc.")
     print("-" * 60)
     
     while True:
@@ -62,12 +62,13 @@ def run_session ():
             if "currentPlan" in result and result["currentPlan"]:
                 print("\n[AI] [Current Plan Status]:")
                 # print(json.dumps(result["currentPlan"], indent=2, ensure_ascii=False))
-                print(result.currentPlan)
+                for node in result["currentPlan"]:
+                    print("Node: ", node.name)
         except KeyboardInterrupt:
             print(f"\n[W] Đột ngột ngắt Session [{session_id}]. Dữ liệu đã lưu tạm.")
             break
         except Exception as e:
-            print(f"\n[E] Có lỗi xảy ra trong Session: {e}")
+            print(f"\n[ERR] Main.py: Có lỗi xảy ra trong Session: {e}")
             
 if __name__ == '__main__':
     # load_dotenv()

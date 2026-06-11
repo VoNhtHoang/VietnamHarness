@@ -40,6 +40,7 @@ def getCurrentDirectory() -> str:
     """Kiểm tra thư mục gốc hiện tại của dự án"""
     return str(PROJECT_ROOT)
 
+
 @tool
 def listFiles(directory: str = ".") -> str:
     """Liệt kê các file tồn tại trong thư mục gốc của dự án"""

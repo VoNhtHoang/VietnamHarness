@@ -76,6 +76,7 @@ class PlannerNode:
         # ]
         # }}
         
+        response = None
         try:
             response = self.llm.with_structured_output(DynamicGraph).invoke(prompt)
             
@@ -84,16 +85,21 @@ class PlannerNode:
             )
             
             # dynamicGraph = json.loads(response)
+            # print("[Planner Node: RES MESSAGES: ", state.resMessages[-1].content if hasattr(state.resMessages[-1], 'content') else str(state.resMessages[-1]))
+            
             return {
                 "relevantAgents": relevantAgents,
                 "currentPlan": response.nodes,
                 "status": "success",
-                "resMessages": state.resMessages + [f" Đã lập kế hoạch đồ thị động thành công với {len(relevantAgents)} agents!"]
+                "resMessages": [
+                    f" Đã lập kế hoạch đồ thị động thành công với {len(relevantAgents)} agents!\n"
+                    f"{response.graphDescription}"
+                ]
             }
         except Exception as e:
             return {
                 "status": "failed",
-                "resMessages": state.resMessages + [f"[i] PlannerNode: Thất bại trong quá trình sinh Dynamic Graph từ LLM: {str(e)}"]
+                "resMessages": [f"[err] PlannerNode: {str(e)}"]
             }
         # prompt = get_sys_prompt() + f"\nYêu cầu của người dùng: {userPrompt}"
         

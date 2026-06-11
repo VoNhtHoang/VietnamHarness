@@ -48,7 +48,7 @@ def list_sessions():
     """ In ra danh sách các session hiện có cho người dùng chọn """
     meta = _load_session_meta()
     if not meta:
-        print("\n📭 Chưa có phiên làm việc (session) nào được tạo.")
+        print("\n Chưa có phiên làm việc (session) nào được tạo.")
         return
 
     print("\n" + "="*70)
@@ -57,4 +57,4 @@ def list_sessions():
     for s_id, info in meta.items():
         print(f"{s_id:<15} | {info['title']:<35} | {info['updated_at']:<15}")
     print("="*70)
-    print("💡 Chạy lệnh: python main.py <session_id> để khôi phục phiên làm việc!")
+    print("Chạy lệnh: python main.py <session_id> để khôi phục phiên làm việc!")

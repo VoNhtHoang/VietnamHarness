@@ -13,7 +13,7 @@ from src.graph.node import Node
 
 class GraphEdge(BaseModel):
     source: str = Field(description="Tên node bắt đầu")
-    target: str = Field(description="Tên node mục tiêu, 'đôi khi' sẽ trống (None) nếu  isCondition là True, hoặc các trường hợp đặc biệt")
+    target: str = Field(description="Tên node mục tiêu, bắt buộc có giá trị nếu không phải là conditional edge.")
     isCondition: bool = Field(default=False, description="Cạnh này có phải là cạnh điều kiện không")
     
     routerCode: Optional[str] = Field(
@@ -46,6 +46,7 @@ class DynamicGraph(BaseModel):
     nodes: List[Node] = Field(description="Danh sách các node, kèm mô tả nhiệm vụ chi tiết của mỗi node cần cho graph")
     edges: List[GraphEdge] = Field(description="Danh sách toàn bộ các cạnh nối tĩnh và cạnh điều kiện")
     entryPoint: str = Field(description="Tên node xuất phát (entrypoint)")
+    graphDescription: str = Field(description="Mô tả ngắn gọn về Dynamic Graph được generate,  tổng quan về cách các agent được dùng.")
     
     
 def createDynamicRouter(routerCode: str):
